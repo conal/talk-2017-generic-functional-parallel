@@ -23,7 +23,10 @@
 %% %format <*> = "\circledast"
 
 %% hack: add missing space, e.g., before "{" in data type decl
-%format SPC = "\ "
+%format SPC = "\, {}"
+%format SPACE = "\ {}"
+%format NOP = "{}"
+%format PAUSE = "\pause"
 
 %format mempty = "\emptyset"
 %format <> = " \oplus "

@@ -36,4 +36,9 @@
 ## Misc notes
 
 *   Consider replacing `Pair` with `LVec2` or `RVec2`.
+*   Define and use the exponentiation notation.
 *   Mention the classic parallel prefix algorithms.
+*   "More goodies" slide (from the paper):
+    *   Log time polynomial evaluation via scan
+    *   Perfect bushes
+

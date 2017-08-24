@@ -236,23 +236,252 @@ instance (LScan g, LScan f, Zip g) =>  LScan (g :.: f) where
 
 \partframe{FFT}
 
-\framet{Perfect bushes}{
+\framet{Discrete Fourier Transform (DFT)}{
+\vspace{0.5in}
+
+{\Large
+$$
+X_k =  \sum\limits_{n=0}^{N-1} x_n e^{\frac{-i2\pi kn}{N}}
+{ \qquad k = 0,\ldots,N-1}
+$$
+}
+
+%\vspace{0.75in}
+~
+
+Direct implementation does $O(N^2)$ work.\\[4ex]
+FFT computes DFT in $O(N \log N)$ work.
+
+}
+
+\TPGrid{364}{273} %% roughly page size in points
+
+%% \setlength{\fboxsep}{0pt}
+
+\newcommand{\upperDFT}{
+%if False
+\begin{textblock}{100}[1,0](348,13)
+{\colorbox{shadecolor}{{\large $X_k = \sum\limits_{n=0}^{N-1} x_n e^{\frac{-i2\pi kn}{N}}$}}}
+\end{textblock}
+%else
+\begin{textblock}{120}[1,0](348,9)
+\begin{tcolorbox}
+\large $X_k = \sum\limits_{n=0}^{N-1} x_n e^{\frac{-i2\pi kn}{N}}$
+\end{tcolorbox}
+\end{textblock}
+%endif
+}
+
+
+\framet{DFT in Haskell}{\upperDFT 
+
+\pause
+
+> dft :: forall f a. ... => Unop (f (Complex a))
+> dft xs = omegas (size @f) $@ xs
+> 
+> omegas :: ... => Int -> g (f (Complex a))
+> omegas n = powers <$> powers (exp (- i * 2 * pi / fromIntegral n))
+
+\pause
+\vspace{-2ex}
+\hrule
+
+%% Utility:
+
+> powers :: ... => a -> f a
+> powers = fst . lscanAla Product . pure
+>
+> ($@) :: ... => n (m a) -> m a -> n a   -- matrix $\times$ vector
+> mat $@ vec = (NOP <.> vec) <$> mat
+>
+> (<.>) :: ... => f a -> f a -> a        -- dot product
+> u <.> v = sum (liftA2 (*) u v)
+
+%% No arrays!
+
+}
+
+\framet{Factoring DFT --- pictures}{
+
+\wfig{3.25in}{cooley-tukey-general}
+\begin{center}
+\vspace{-5ex}
+\sourced{https://en.wikipedia.org/wiki/Cooley\%E2\%80\%93Tukey_FFT_algorithm\#General_factorizations}
+\end{center}
+
+\vspace{-2ex}
+\pause
+How might we implement in Haskell?
+}
+
+\setlength{\fboxsep}{1.5pt}
+
+%% \definecolor{white}{rgb}{1,1,1}
+
+\newcommand{\upperCT}{
+%if True
+\begin{textblock}{153}[1,0](353,7)
+\begin{tcolorbox}
+\wpicture{1.9in}{cooley-tukey-general}
+\end{tcolorbox}
+\end{textblock}
+%else
+\begin{textblock}{149}[1,0](353,12)
+\colorbox{white}{\fbox{\wpicture{2in}{cooley-tukey-general}}}
+\end{textblock}
+%endif
+}
+
+\framet{Factoring DFT --- Haskell}{\upperCT
+
+\vspace{4ex}
+\pause
+
+Factor types, not numbers!
+
+%% \vspace{1ex}
+
+> newtype (g :.: f) a = Comp1 (g (f a))
+
+\pause
+\vspace{-4ex}
+
+> instance (Sized g, Sized f) => Sized (g :.: f) where
+>   size = size @g * size @f
+
+\vspace{-4ex}
+
+\pause
+Also closed under composition:
+% |Functor|, |Applicative|, |Foldable|, |Traversable|.
+
+\vspace{-1.5ex}
+\begin{itemize}
+\item |Functor|
+\item |Applicative|
+\item |Foldable|
+\item |Traversable|
+\end{itemize}
+
+%% \vspace{1ex}
+%% Exercise: work out the instances.
+
+}
+
+\framet{Factoring DFT --- Haskell}{\upperCT
+
+\vspace{2ex}
+
+> class FFT f where
+>   type FFO f :: * -> *
+>   fft :: f C -> FFO f C
+
+\pause\vspace{-2ex}
+
+> instance NOP ... => FFT (g :.: f) where
+>   type FFO (g :.: f) = FFO f :.: FFO g
+>   fft = Comp1 . ffts' . transpose . twiddle . ffts' . unComp1
+
+> ffts' :: ... => g (f C) -> FFO g (f C)
+> ffts' = transpose . fmap fft . transpose
+>
+> twiddle :: ... => g (f C) -> g (f C)
+> twiddle = (liftA2.liftA2) (*) (omegas (size @(g :.: f)))
+
+}
+
+%if False
+\framet{Typing}{
+
+> ffts' :: ... => g (f C) -> FFO g (f C)
+> ffts' = transpose . fmap fft . transpose
+>
+> transpose  :: g (f C)      -> f (g C)
+> fmap fft   :: f (g C)      -> f (FFO g C)
+> transpose  :: f (FFO g C)  -> FFO g (f C)
+
+> instance NOP ... => FFT (g :.: f) where
+>   type FFO (g :.: f) = FFO f :.: FFO g
+>   fft = Comp1 . ffts' . transpose . twiddle . ffts' . unComp1
+>
+> ffts'      :: g (f C)      -> FFO g (f C)
+> twiddle    :: FFO g (f C)  -> FFO g (f C)
+> transpose  :: FFO g (f C)  -> f (FFO g C)
+> ffts'      :: f (FFO g C)  -> FFO f (FFO g C)
+
+}
+%endif
+
+%if False
+\framet{Optimizing |fft| for |g :.: f|}{
+
+>     ffts' . transpose . twiddle . ffts'
+> ==     
+>        transpose . fmap fft . transpose
+>     .  transpose
+>     .  twiddle
+>     .  transpose . fmap fft . transpose
+> ==  
+>     transpose . fmap fft . twiddle . transpose . fmap fft . transpose
+> ==  
+>     traverse fft . twiddle . traverse fft . transpose
+
+}
+%endif
+
+\framet{Binary FFT}{
+
+Uniform pairs:
+
+> data Pair a = a :# a deriving (Functor,Foldable,Traversable)
+
+> instance Sized Pair where size = 2
+>
+> instance FFT Pair where
+>   type FFO Pair = Pair
+>   fft = dft
+
+Equivalently,
+
+> SPACE fft (a :# b) = (a + b) :# (a - b)
+
+}
+
+\framet{|fft @(RPow Pair N0)|}{\vspace{ 2.0ex}\wfig{4.0in}{circuits/fft-rb0}}
+\framet{|fft @(LPow Pair N0)|}{\vspace{ 2.0ex}\wfig{4.0in}{circuits/fft-lb0}}
+\framet{|fft @(RPow Pair N1)|}{\vspace{-0.0ex}\wfig{4.4in}{circuits/fft-rb1}}
+\framet{|fft @(LPow Pair N1)|}{\vspace{-0.0ex}\wfig{4.4in}{circuits/fft-lb1}}
+\framet{|fft @(RPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-rb2}}
+\framet{|fft @(LPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-lb2}}
+\framet{|fft @(RPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-rb3}}
+\framet{|fft @(LPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-lb3}}
+\framet{|fft @(RPow Pair N4)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb4}}
+\framet{|fft @(LPow Pair N4)|}{\vspace{-1.0ex}\wfig{4.6in}{circuits/fft-lb4}}
+\framet{|fft @(RPow Pair N5)|}{\vspace{-4.0ex}\wfig{4.8in}{circuits/fft-rb5}}
+\framet{|fft @(LPow Pair N5)|}{\vspace{ 0.0ex}\wfig{4.8in}{circuits/fft-lb5}}
+\framet{|fft @(RPow Pair N6)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb6}}
+\framet{|fft @(LPow Pair N6)|}{\vspace{-3.0ex}\wfig{4.8in}{circuits/fft-lb6}}
+
+\framet{More goodies in the paper}{
 \begin{itemize}\itemsep3ex
 \item
-  The type family
+  Log time polynomial evaluation via scan
 \item
-  Examples and comparisons
+  Perfect bushes (balanced compositions, $2^{2^n}$)
 \end{itemize}
 }
 
 \framet{Conclusions}{
-\begin{itemize}\itemsep3ex
-\item
-  In contrast to array algorithms (FFT slide 41)
-\item
-  Four well-known parallel algorithms
-\item
-  Two possibly new ones
+\begin{itemize}\itemsep2ex
+\item Alternative to array programming:
+  \begin{itemize}\itemsep2ex
+  \item Elegantly compositional.
+  \item Uncluttered by index computations.
+  \item Safe from out-of-bounds errors.
+  \end{itemize}
+\item Four well-known parallel algorithms.
+\item Two possibly new ones.
 \end{itemize}
 }
 
