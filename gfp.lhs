@@ -18,6 +18,8 @@
 \subtitle{Scan and FFT}
 \date{September 2017}
 
+\setlength{\itemsep}{2ex}
+\setlength{\parskip}{1ex}
 \setlength{\blanklineskip}{1.5ex}
 \setlength\mathindent{4ex}
 
@@ -408,10 +410,11 @@ How might we implement in Haskell?
 
 \framet{Factoring DFT --- Haskell}{\upperCT
 
-\vspace{4ex}
 \pause
 
 Factor types, not numbers!
+
+\vspace{4ex}
 
 %% \vspace{1ex}
 
@@ -422,6 +425,8 @@ Factor types, not numbers!
 
 > instance (Sized g, Sized f) => Sized (g :.: f) where
 >   size = size @g * size @f
+
+%if False
 
 \vspace{-4ex}
 
@@ -439,6 +444,8 @@ Also closed under composition:
 
 %% \vspace{1ex}
 %% Exercise: work out the instances.
+
+%endif
 
 }
 
