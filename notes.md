@@ -4,7 +4,7 @@
 
 *   Arrays:
     *   Dominant data type for parallel programming (even functional).
-    *   Unsafe (indexing is partial)
+    *   Unsafe (indexing is partial).
     *   Obfuscates parallel algorithms (array encodings).
 *   Generic programming:
     *   Building blocks: functor sum, product, composition, and their identities.
@@ -35,3 +35,5 @@
 
 ## Misc notes
 
+*   Consider replacing `Pair` with `LVec2` or `RVec2`.
+*   Mention the classic parallel prefix algorithms.

@@ -6,7 +6,7 @@ all: $(TARG).pdf
 
 see: $(TARG).see
 
-dots = $(wildcard Figures/*.dot)
+dots = $(wildcard Figures/circuits/*.dot)
 pdfs = $(addsuffix .pdf, $(basename $(dots))) $(wildcard Figures/circuits/*-scaled.pdf)
 
 %.pdf: %.tex $(pdfs) Makefile
