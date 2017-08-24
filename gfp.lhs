@@ -29,13 +29,13 @@
 \institute{Target}
 
 \framet{Arrays}{
-\begin{itemize}\itemsep3ex
+\begin{itemize}\itemsep5ex
 \item
   Dominant data type for parallel programming (even functional).
 \item
   Unsafe (indexing is partial).
 \item
-  Obfuscates parallel algorithms (array encodings).
+  Obfuscate parallel algorithms (array encodings).
 \end{itemize}
 }
 
@@ -52,7 +52,6 @@ newtype  (g  :.:  f)  a = Comp1 (g (f a))      -- composition
 \end{code}
 
 \pause
-\vspace{1ex}
 
 Plan:
 
@@ -64,9 +63,83 @@ Plan:
 \end{itemize}
 }
 
-\framet{Some data types}{
+\partframe{Some data types}
 
+\framet{Vectors}{
+
+\begin{center}
+\Large $f^n = \overbrace{f \times \cdots \times f\:}^{n \text{~times}}$
+\end{center}
+\vspace{0ex}
+
+Right-associated:
+\begin{code}
+type family RVec n where
+  RVec Z      = U1
+  RVec (S n)  = Par1 :*: RVec n
+\end{code}
+
+\pause%\vspace{2ex}
+
+Left-associated:
+\begin{code}
+type family LVec n where
+  LVec Z      = U1
+  LVec (S n)  = LVec n :*: Par1
+\end{code}
+
+\pause%\vspace{2ex}
+
+Also convenient:
+\begin{code}
+type Pair = Par1 :*: Par1   -- or |RVec N2| or |LVec N2|
+\end{code}
 }
+
+\framet{Functor exponentiation}{
+\begin{center}
+\Large $f^n = \overbrace{f \circ \cdots \circ f\:}^{n \text{~times}}$
+\end{center}
+\vspace{0ex}
+Right-associated/top-down:
+
+\begin{code}
+type family RPow h n where
+  RPow h Z      = Par1
+  RPow h (S n)  = h :.: RPow h n
+\end{code}
+
+Left-associated/bottom-up:
+\begin{code}
+type family LPow h n where
+  LPow h Z      = Par1
+  LPow h (S n)  = LPow h n :.: h
+\end{code}
+
+\vspace{6ex}
+}
+
+\framet{Bushes}{
+\vspace{5ex}
+\begin{code}
+type family Bush n where
+  Bush Z      = Pair
+  Bush (S n)  = Bush n :.: Bush n
+\end{code}
+\vspace{3ex}\pause
+
+% Notes:
+\begin{itemize}\itemsep2ex
+\item
+Composition-balanced counterpart to |LPow| and |RPow|.
+% \item Variation of |Bush| type in \href{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.184.8120}{\emph{Nested Datatypes}} by Bird \& Meertens.
+\item
+Size $2^{2^n}$, i.e., $2, 4, 16, 256, 65536, \ldots$.
+\item
+Easily generalizes beyond pairing and squaring.
+\end{itemize}
+}
+
 
 \partframe{Scan}
 
@@ -466,9 +539,9 @@ Equivalently,
 \framet{More goodies in the paper}{
 \begin{itemize}\itemsep3ex
 \item
-  Log time polynomial evaluation via scan
+  Log time polynomial evaluation via scan.
 \item
-  Perfect bushes (balanced compositions, $2^{2^n}$)
+  Scan and FFT on bushes.
 \end{itemize}
 }
 
