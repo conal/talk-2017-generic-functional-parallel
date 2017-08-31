@@ -103,7 +103,7 @@
 %format Comp1
 %format unComp1
 %format L1
-%format R1
+%format R1 = "\Varid{R}_1"
 
 %format Par1 = "\Varid{I}_1"
 %format unPar1 = "\Varid{unI}_1"

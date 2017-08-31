@@ -553,9 +553,10 @@ Equivalently,
 }
 
 \framet{Conclusions}{
-\begin{itemize}\itemsep2ex
+\rnc{\baselinestretch}{2.0}
+\begin{itemize}
 \item Alternative to array programming:
-  \begin{itemize}\itemsep2ex
+  \begin{itemize}
   \item Elegantly compositional.
   \item Uncluttered by index computations.
   \item Safe from out-of-bounds errors.
