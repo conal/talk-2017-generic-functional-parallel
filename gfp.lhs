@@ -528,27 +528,30 @@ Equivalently,
 
 }
 
+%if False
 \framet{|fft @(RPow Pair N0)|}{\vspace{ 2.0ex}\wfig{4.0in}{circuits/fft-rb0}}
 \framet{|fft @(LPow Pair N0)|}{\vspace{ 2.0ex}\wfig{4.0in}{circuits/fft-lb0}}
 \framet{|fft @(RPow Pair N1)|}{\vspace{-0.0ex}\wfig{4.4in}{circuits/fft-rb1}}
 \framet{|fft @(LPow Pair N1)|}{\vspace{-0.0ex}\wfig{4.4in}{circuits/fft-lb1}}
 \framet{|fft @(RPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-rb2}}
 \framet{|fft @(LPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-lb2}}
+%endif
 \framet{|fft @(RPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-rb3}}
 \framet{|fft @(LPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-lb3}}
 \framet{|fft @(RPow Pair N4)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb4}}
 \framet{|fft @(LPow Pair N4)|}{\vspace{-1.0ex}\wfig{4.6in}{circuits/fft-lb4}}
 \framet{|fft @(RPow Pair N5)|}{\vspace{-4.0ex}\wfig{4.8in}{circuits/fft-rb5}}
 \framet{|fft @(LPow Pair N5)|}{\vspace{ 0.0ex}\wfig{4.8in}{circuits/fft-lb5}}
+%if False
 \framet{|fft @(RPow Pair N6)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb6}}
 \framet{|fft @(LPow Pair N6)|}{\vspace{-3.0ex}\wfig{4.8in}{circuits/fft-lb6}}
+%endif
 
 \framet{More goodies in the paper}{
 \begin{itemize}\itemsep3ex
-\item
-  Log time polynomial evaluation via scan.
-\item
-  Scan and FFT on bushes.
+\item Complexity, generically
+\item Log time polynomial evaluation via scan.
+\item Scan and FFT on bushes.
 \end{itemize}
 }
 
@@ -560,9 +563,10 @@ Equivalently,
   \item Elegantly compositional.
   \item Uncluttered by index computations.
   \item Safe from out-of-bounds errors.
+  \item Reveals algorithm essence and connections.
   \end{itemize}
-\item Four well-known parallel algorithms.
-\item Two possibly new ones.
+\item Four well-known parallel algorithms (perfect trees).
+\item Two possibly new ones (bushes).
 \end{itemize}
 }
 
