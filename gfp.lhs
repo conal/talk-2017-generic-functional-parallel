@@ -175,8 +175,8 @@ Note that $a_k$ does \emph{not} influence $b_k$.
 Linear \emph{dependency chain} thwarts parallelism (depth $<$ work).
 }
 
-\framet{Scan class}{
-%% \vspace{10ex}
+\framet{Scan interface}{\mathindent12ex
+\vspace{5ex}
 \begin{code}
 class Functor f => LScan f where
   lscan :: Monoid a => f a -> f a :* a
@@ -254,12 +254,12 @@ instance (LScan f, LScan g) => LScan (f :*: g) where
 \end{code}
 }
 
-\circuit{|RVec N8| (unoptimized)}{-1}{lsums-rv8-no-hash-no-opt}{36}{8}
-\circuit{|RVec N8| (optimized)}{-1}{lsums-rv8}{28}{7}
-\circuit{|LVec N8| (unoptimized)}{0}{lsums-lv8-no-hash-no-opt}{16}{8}
-\circuit{|LVec N8| (optimized)}{0}{lsums-lv8}{7}{7}
-\circuit{|LVec N16| (optimized)}{0}{lsums-lv16}{15}{15}
-\circuit{|LVec N8 :*: LVec N8|}{0}{lsums-p-lv8}{22}{8}
+%% \circuit{|LVec N8| (unoptimized)}{0}{lsums-lv8-no-hash-no-opt}{16}{8}
+%% \circuit{|LVec N8|}{0}{lsums-lv8}{7}{7}
+%% \circuit{|LVec N16|}{0}{lsums-lv16}{15}{15}
+%% \circuit{|LVec N8 :*: LVec N8|}{0}{lsums-p-lv8}{22}{8}
+%% \circuit{|RVec N8| (unoptimized)}{-1}{lsums-rv8-no-hash-no-opt}{36}{8}
+\circuit{|RVec N8|}{-1}{lsums-rv8}{28}{7}
 
 
 \framet{Composition example: |LVec N3 :.: LVec N4|}{
@@ -304,7 +304,7 @@ instance (LScan g, LScan f, Zip g) =>  LScan (g :.: f) where
 \circuit{|RPow (LVec N4) N2|}{0}{lsums-lpow-4-2}{24}{6}
 
 \circuit{|RPow Pair 4|}{-1}{lsums-rb4}{32}{4}
-\circuit{|LPow Pair 4|}{-1}{lsums-lb4}{32}{4}
+\circuit{|LPow Pair 4|}{-1}{lsums-lb4}{26}{6}
 
 %% \circuit{$2^4 = (2^2)^2 = (2 \times 2) \times (2 \times 2)$}{-1}{lsums-bush2}{29}{5}
 
@@ -348,6 +348,7 @@ FFT computes DFT in $O(N \log N)$ work.
 }
 
 
+%if False
 \framet{DFT in Haskell}{\upperDFT 
 
 \pause
@@ -389,6 +390,8 @@ FFT computes DFT in $O(N \log N)$ work.
 \pause
 How might we implement in Haskell?
 }
+
+%endif
 
 \setlength{\fboxsep}{1.5pt}
 
@@ -465,11 +468,13 @@ Also closed under composition:
 
 > ffts' :: ... => g (f C) -> FFO g (f C)
 > ffts' = transpose . fmap fft . transpose
->
-> twiddle :: ... => g (f C) -> g (f C)
-> twiddle = (liftA2.liftA2) (*) (omegas (size @(g :.: f)))
 
 }
+
+%% >
+%% > twiddle :: ... => g (f C) -> g (f C)
+%% > twiddle = (liftA2.liftA2) (*) (omegas (size @(g :.: f)))
+
 
 %if False
 \framet{Typing}{
@@ -508,7 +513,6 @@ Also closed under composition:
 >     traverse fft . twiddle . traverse fft . transpose
 
 }
-%endif
 
 \framet{Binary FFT}{
 
@@ -527,6 +531,7 @@ Equivalently,
 > SPACE fft (a :# b) = (a + b) :# (a - b)
 
 }
+%endif
 
 %if False
 \framet{|fft @(RPow Pair N0)|}{\vspace{ 2.0ex}\wfig{4.0in}{circuits/fft-rb0}}
@@ -535,23 +540,24 @@ Equivalently,
 \framet{|fft @(LPow Pair N1)|}{\vspace{-0.0ex}\wfig{4.4in}{circuits/fft-lb1}}
 \framet{|fft @(RPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-rb2}}
 \framet{|fft @(LPow Pair N2)|}{\vspace{-0.5ex}\wfig{4.2in}{circuits/fft-lb2}}
-%endif
 \framet{|fft @(RPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-rb3}}
 \framet{|fft @(LPow Pair N3)|}{\vspace{-0.5ex}\wfig{4.6in}{circuits/fft-lb3}}
+%endif
 \framet{|fft @(RPow Pair N4)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb4}}
 \framet{|fft @(LPow Pair N4)|}{\vspace{-1.0ex}\wfig{4.6in}{circuits/fft-lb4}}
+%if False
 \framet{|fft @(RPow Pair N5)|}{\vspace{-4.0ex}\wfig{4.8in}{circuits/fft-rb5}}
 \framet{|fft @(LPow Pair N5)|}{\vspace{ 0.0ex}\wfig{4.8in}{circuits/fft-lb5}}
-%if False
 \framet{|fft @(RPow Pair N6)|}{\vspace{-2.0ex}\wfig{4.6in}{circuits/fft-rb6}}
 \framet{|fft @(LPow Pair N6)|}{\vspace{-3.0ex}\wfig{4.8in}{circuits/fft-lb6}}
 %endif
 
 \framet{More goodies in the paper}{
 \begin{itemize}\itemsep3ex
-\item Complexity, generically
-\item Log time polynomial evaluation via scan.
 \item Scan and FFT on bushes.
+\item Log time polynomial evaluation via scan.
+\item Complexity, generically.
+\item Details, examples.
 \end{itemize}
 }
 
