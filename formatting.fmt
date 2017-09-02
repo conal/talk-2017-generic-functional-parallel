@@ -69,15 +69,15 @@
 
 %% spaces (in 18ths of a quad): \, = 3, \: = 4, \; = 5, \! = -3
 
-%% %format :*: = " \pmb{\times} "
-%% %format :+: = " \pmb{+} "
-%% %format :.: = " \pmb{\circ} "
+%format :*: = "\btimes"
+%format :+: = "\bplus"
+%format :.: = "\bcomp"
 
 %% \pmb and \boldsymbol for these symbols look alike to me.
 
-%format :*: = " \boldsymbol{\times} "
-%format :+: = " \boldsymbol{+} "
-%format :.: = " \boldsymbol{\circ} "
+%% %format :*: = " \boldsymbol{\times} "
+%% %format :+: = " \boldsymbol{+} "
+%% %format :.: = " \boldsymbol{\circ} "
 
 %% %format :*: = "\mathbin{\times_1}"
 %% %format :+: = "\mathbin{+_1}"
@@ -108,9 +108,37 @@
 %format Par1 = "\Varid{I}_1"
 %format unPar1 = "\Varid{unI}_1"
 
+%format V1 = V
+%format U1 = U
+%format Par1 = I
+%format unPar1 = unI
+%format L1 = L
+%format R1 = "\Varid{R}"
+
 %format Comp1 = "\Varid{O}_1"
 %format unComp1 = "\Varid{unO}_1"
 
 %format :# = "\mathbin{:\!\!\#}"
 
 %format FFO = Reverse
+
+%format (RVec (n)) = "\overrightarrow{"n"}"
+%format (LVec (n)) = "\overleftarrow{"n"}"
+
+%% %format (RPow (h) (n)) = h"^{\overrightarrow{"n"}}"
+%% %format (LPow (h) (n)) = h"^{\overleftarrow{"n"}}"
+
+%format (RPow (h) (n)) = h"^{\downarrow"n"}"
+%format (LPow (h) (n)) = h"^{\uparrow"n"}"
+
+%format Pair = 2
+
+%% %format (Bush (n)) = pow 2 (pow 2 n)
+%% %format pow a b = a"^{"b"}"
+%% %format (pow (a) (b)) = a"^{"b"}"
+
+%format (Bush (n)) = "2^{2^{"n"}}"
+
+%format Z = 0
+%format S  n = n + 1
+%format S' n = 1 + n
