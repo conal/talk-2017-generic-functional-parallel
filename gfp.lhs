@@ -70,13 +70,13 @@ Plan:
 \framet{Vectors}{
 
 \begin{center}
-\Large $f^n = \overbrace{f \times \cdots \times f\:}^{n \text{~times}}$
+\Large $n = \overbrace{I_1 \times \cdots \times I_1\:}^{n \text{~times}}$
 \end{center}
-\vspace{0ex}
+% \vspace{0ex}
 
 Right-associated:
 \begin{code}
-type family RVec n where
+type family (RVec n) where
   RVec Z      = U1
   RVec (S n)  = Par1 :*: RVec n
 \end{code}
@@ -85,46 +85,52 @@ type family RVec n where
 
 Left-associated:
 \begin{code}
-type family LVec n where
+type family (LVec n) where
   LVec Z      = U1
   LVec (S n)  = LVec n :*: Par1
 \end{code}
 
 \pause%\vspace{2ex}
 
+%if False
 Also convenient:
 \begin{code}
 type Pair = Par1 :*: Par1   -- or |RVec N2| or |LVec N2|
 \end{code}
+%endif
+
 }
 
 \framet{Functor exponentiation}{
 \begin{center}
-\Large $f^n = \overbrace{f \circ \cdots \circ f\:}^{n \text{~times}}$
+\Large $h^n = \overbrace{h \bcomp \cdots \bcomp h\:}^{n \text{~times}}$
 \end{center}
-\vspace{0ex}
+
+%% \vspace{0ex}
+
 Right-associated/top-down:
 
 \begin{code}
-type family RPow h n where
+type family (RPow h n) where
   RPow h Z      = Par1
   RPow h (S n)  = h :.: RPow h n
 \end{code}
 
 Left-associated/bottom-up:
 \begin{code}
-type family LPow h n where
+type family (LPow h n) where
   LPow h Z      = Par1
   LPow h (S n)  = LPow h n :.: h
 \end{code}
 
-\vspace{6ex}
+% \vspace{6ex}
+
 }
 
 \framet{Bushes}{
 \vspace{5ex}
 \begin{code}
-type family Bush n where
+type family (Bush n) where
   Bush Z      = Pair
   Bush (S n)  = Bush n :.: Bush n
 \end{code}
@@ -133,7 +139,7 @@ type family Bush n where
 % Notes:
 \begin{itemize}\itemsep2ex
 \item
-Composition-balanced counterpart to |LPow| and |RPow|.
+Composition-balanced counterpart to |LPow h n| and |RPow h n|.
 % \item Variation of |Bush| type in \href{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.184.8120}{\emph{Nested Datatypes}} by Bird \& Meertens.
 \item
 Size $2^{2^n}$, i.e., $2, 4, 16, 256, 65536, \ldots$.
@@ -225,7 +231,7 @@ instance (LScan f, LScan g) => LScan (f :+: g) where
 %format Vec = LVec
 
 %% $a^{16} = a^5 \times a^{11}$
-\framet{Product example: |Vec N5 :*: Vec N11|}{
+\framet{Product example: |LVec N5 :*: LVec N11|}{
 \vspace{-2ex}
 \wfig{2.3in}{circuits/lsums-lv5}
 \vspace{-5ex}
@@ -255,7 +261,7 @@ instance (LScan f, LScan g) => LScan (f :*: g) where
 }
 
 %% \circuit{|LVec N8| (unoptimized)}{0}{lsums-lv8-no-hash-no-opt}{16}{8}
-%% \circuit{|LVec N8|}{0}{lsums-lv8}{7}{7}
+\circuit{|LVec N8|}{0}{lsums-lv8}{7}{7}
 %% \circuit{|LVec N16|}{0}{lsums-lv16}{15}{15}
 %% \circuit{|LVec N8 :*: LVec N8|}{0}{lsums-p-lv8}{22}{8}
 %% \circuit{|RVec N8| (unoptimized)}{-1}{lsums-rv8-no-hash-no-opt}{36}{8}
@@ -378,20 +384,27 @@ FFT computes DFT in $O(N \log N)$ work.
 
 }
 
+%endif
+
 \framet{Factoring DFT --- pictures}{
 
 \wfig{3.25in}{cooley-tukey-general}
+%if False
 \begin{center}
 \vspace{-5ex}
 \sourced{https://en.wikipedia.org/wiki/Cooley\%E2\%80\%93Tukey_FFT_algorithm\#General_factorizations}
 \end{center}
+%else
+\begin{flushright}
+\vspace{-5ex}
+{\tiny \href{https://en.wikipedia.org/wiki/Cooley\%E2\%80\%93Tukey_FFT_algorithm\#General_factorizations}{Johnson [2010]}\hspace{10ex}\ }
+\end{flushright}
+%endif
 
 \vspace{-2ex}
 \pause
-How might we implement in Haskell?
+How might we express generically?
 }
-
-%endif
 
 \setlength{\fboxsep}{1.5pt}
 
@@ -399,7 +412,7 @@ How might we implement in Haskell?
 
 \newcommand{\upperCT}{
 %if True
-\begin{textblock}{153}[1,0](353,7)
+\begin{textblock}{193}[1,0](353,7)
 \begin{tcolorbox}
 \wpicture{1.9in}{cooley-tukey-general}
 \end{tcolorbox}
@@ -411,10 +424,11 @@ How might we implement in Haskell?
 %endif
 }
 
-\framet{Factoring DFT --- Haskell}{\upperCT
+\framet{Factoring DFT\out{ --- Haskell}}{\upperCT
 
 \pause
 
+\vspace{4ex}
 Factor types, not numbers!
 
 \vspace{4ex}
@@ -452,9 +466,9 @@ Also closed under composition:
 
 }
 
-\framet{Factoring DFT --- Haskell}{\upperCT
-
-\vspace{2ex}
+\framet{Factoring DFT\out{ --- Haskell}}{\upperCT
+\mathindent2ex
+\vspace{6ex}
 
 > class FFT f where
 >   type FFO f :: * -> *
@@ -554,10 +568,11 @@ Equivalently,
 
 \framet{More goodies in the paper}{
 \begin{itemize}\itemsep3ex
-\item Scan and FFT on bushes.
+\item Scan and FFT on |Bush n|.
 \item Log time polynomial evaluation via scan.
 \item Complexity, generically.
-\item Details, examples.
+\item Additional examples.
+\item Details.
 \end{itemize}
 }
 
@@ -571,8 +586,8 @@ Equivalently,
   \item Safe from out-of-bounds errors.
   \item Reveals algorithm essence and connections.
   \end{itemize}
-\item Four well-known parallel algorithms (perfect trees).
-\item Two possibly new ones (bushes).
+\item Four well-known parallel algorithms: |RPow h n|, |LPow h n|. % perfect trees
+\item Two possibly new and useful algorithms: |Bush n|. % bushes
 \end{itemize}
 }
 
