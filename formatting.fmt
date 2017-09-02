@@ -112,3 +112,5 @@
 %format unComp1 = "\Varid{unO}_1"
 
 %format :# = "\mathbin{:\!\!\#}"
+
+%format FFO = Reverse
