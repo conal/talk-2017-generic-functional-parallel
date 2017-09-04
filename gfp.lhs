@@ -2,8 +2,8 @@
 
 % Presentation
 %\documentclass[aspectratio=1610]{beamer} % Macbook Pro screen 16:10
-%% \documentclass{beamer} % default aspect ratio 4:3
-\documentclass[handout]{beamer}
+\documentclass{beamer} % default aspect ratio 4:3
+%% \documentclass[handout]{beamer}
 
 % \setbeameroption{show notes} % un-comment to see the notes
 
@@ -70,16 +70,9 @@ Plan:
 \framet{Vectors}{
 
 \begin{center}
-\Large $n = \overbrace{I_1 \times \cdots \times I_1\:}^{n \text{~times}}$
+\Large $n = \overbrace{I \btimes \cdots \btimes I\:}^{n \text{~times}}$
 \end{center}
 % \vspace{0ex}
-
-Right-associated:
-\begin{code}
-type family (RVec n) where
-  RVec Z      = U1
-  RVec (S n)  = Par1 :*: RVec n
-\end{code}
 
 \pause%\vspace{2ex}
 
@@ -90,9 +83,16 @@ type family (LVec n) where
   LVec (S n)  = LVec n :*: Par1
 \end{code}
 
-\pause%\vspace{2ex}
+Right-associated:
+\begin{code}
+type family (RVec n) where
+  RVec Z      = U1
+  RVec (S n)  = Par1 :*: RVec n
+\end{code}
 
 %if False
+\pause%\vspace{2ex}
+
 Also convenient:
 \begin{code}
 type Pair = Par1 :*: Par1   -- or |RVec N2| or |LVec N2|
@@ -101,20 +101,12 @@ type Pair = Par1 :*: Par1   -- or |RVec N2| or |LVec N2|
 
 }
 
-\framet{Functor exponentiation}{
+\framet{Perfect trees}{
 \begin{center}
 \Large $h^n = \overbrace{h \bcomp \cdots \bcomp h\:}^{n \text{~times}}$
 \end{center}
 
 %% \vspace{0ex}
-
-Right-associated/top-down:
-
-\begin{code}
-type family (RPow h n) where
-  RPow h Z      = Par1
-  RPow h (S n)  = h :.: RPow h n
-\end{code}
 
 Left-associated/bottom-up:
 \begin{code}
@@ -123,10 +115,18 @@ type family (LPow h n) where
   LPow h (S n)  = LPow h n :.: h
 \end{code}
 
+Right-associated/top-down:
+\begin{code}
+type family (RPow h n) where
+  RPow h Z      = Par1
+  RPow h (S n)  = h :.: RPow h n
+\end{code}
+
 % \vspace{6ex}
 
 }
 
+%if False
 \framet{Bushes}{
 \vspace{5ex}
 \begin{code}
@@ -134,12 +134,15 @@ type family (Bush n) where
   Bush Z      = Pair
   Bush (S n)  = Bush n :.: Bush n
 \end{code}
-\vspace{3ex}\pause
+\vspace{3ex}
+%\pause
 
 % Notes:
 \begin{itemize}\itemsep2ex
 \item
-Composition-balanced counterpart to |LPow h n| and |RPow h n|.
+Composition-balanced counterpart to
+|LPow Pair (pow 2 n)| and |RPow Pair (pow 2 n)|.
+% |LPow h n| and |RPow h n|.
 % \item Variation of |Bush| type in \href{http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.184.8120}{\emph{Nested Datatypes}} by Bird \& Meertens.
 \item
 Size $2^{2^n}$, i.e., $2, 4, 16, 256, 65536, \ldots$.
@@ -147,7 +150,7 @@ Size $2^{2^n}$, i.e., $2, 4, 16, 256, 65536, \ldots$.
 Easily generalizes beyond pairing and squaring.
 \end{itemize}
 }
-
+%endif
 
 \partframe{Scan}
 
@@ -177,8 +180,8 @@ Note that $a_k$ does \emph{not} influence $b_k$.
 \emph{Depth}: $O(n)$ (ideal parallel ``time'')
 
 \vspace{2ex}
-\pause
-Linear \emph{dependency chain} thwarts parallelism (depth $<$ work).
+%\pause
+Linear \emph{dependency chain} thwarts parallelism\out{ (depth $<$ work)}.
 }
 
 \framet{Scan interface}{\mathindent12ex
@@ -220,7 +223,7 @@ instance LScan Par1  where lscan (Par1 a) = (Par1 mempty, a)
 \end{center}
 \vspace{-3ex}
 %endif
-\pause
+%\pause
 \begin{code}
 instance (LScan f, LScan g) => LScan (f :+: g) where
   lscan (L1  fa  ) = first L1  (lscan fa  )
@@ -280,11 +283,12 @@ instance (LScan f, LScan g) => LScan (f :*: g) where
 }
 
 \ccircuit{Combine?}{-1}{lsums-lv3olv4-unknown-no-hash}
+\ccircuit{|(LVec N4 :*: LVec N4) :*: LVec N4|}{0}{lsums-lv3olv4}
 \ccircuit{|LVec N3 :.: LVec N4|}{0}{lsums-lv3olv4}
 \ccircuit{|LVec N3 :.: LVec N4|}{0}{lsums-lv3olv4-highlight}
 
-\ccircuit{|LVec N5 :.: LVec N7|}{-1.5}{lsums-lv5olv7}
-\ccircuit{|LVec N5 :.: LVec N7|}{-1.5}{lsums-lv5olv7-highlight}
+%% \ccircuit{|LVec N5 :.: LVec N7|}{-1.5}{lsums-lv5olv7}
+%% \ccircuit{|LVec N5 :.: LVec N7|}{-1.5}{lsums-lv5olv7-highlight}
 
 \framet{Composition}{
 \begin{textblock}{200}[1,0](350,5)
@@ -307,7 +311,7 @@ instance (LScan g, LScan f, Zip g) =>  LScan (g :.: f) where
 \circuit{|LVec N8 :.: Pair|}{0}{lsums-lv8-p}{22}{8}
 \circuit{|LVec N4 :.: LVec N4|}{0}{lsums-lv4olv4}{24}{6}
 
-\circuit{|RPow (LVec N4) N2|}{0}{lsums-lpow-4-2}{24}{6}
+\circuit{|Pow (LVec N4) N2|}{0}{lsums-lpow-4-2}{24}{6}
 
 \circuit{|RPow Pair 4|}{-1}{lsums-rb4}{32}{4}
 \circuit{|LPow Pair 4|}{-1}{lsums-lb4}{26}{6}
@@ -474,7 +478,8 @@ Also closed under composition:
 >   type FFO f :: * -> *
 >   fft :: f C -> FFO f C
 
-\pause\vspace{-2ex}
+%\pause
+\vspace{-2ex}
 
 > instance NOP ... => FFT (g :.: f) where
 >   type FFO (g :.: f) = FFO f :.: FFO g
