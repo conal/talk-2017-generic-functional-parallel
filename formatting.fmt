@@ -133,9 +133,11 @@
 
 %format Pair = 2
 
+%format (Pow (h) (n)) = h"^{"n"}"
+
 %% %format (Bush (n)) = pow 2 (pow 2 n)
 %% %format pow a b = a"^{"b"}"
-%% %format (pow (a) (b)) = a"^{"b"}"
+%format (pow (a) (b)) = a"^{"b"}"
 
 %format (Bush (n)) = "2^{2^{"n"}}"
 
